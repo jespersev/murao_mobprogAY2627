@@ -12,7 +12,7 @@ Laboratory 0: In this activity, I experienced installing and setting up Flutter 
 
 ---
 
-## Laboratory Activity 1A: Facebook Replica
+## Laboratory Activity 1A: File Structuring | Design Pattern
 
 ### Discussion
 
