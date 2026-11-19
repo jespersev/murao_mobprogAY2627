@@ -10,28 +10,18 @@ class NewsFeedScreen extends StatelessWidget {
     return ListView(
       children: const [
         NewsFeedCard(
-          userName: 'Jesper Sev V. Murao',
-          postContent: 'My first Flutter application!',
-          numOfLikes: 100,
-          date: 'November 19',
-          hasImage: true,
-          profileImage: 'assets/images/1x1.jpg',
-          postImage: 'assets/images/gta6.jpg',
-        ),
-
-        NewsFeedCard(
-          userName: 'Cyrus Robles',
-          postContent: 'Kamusta',
-          numOfLikes: 100,
+          userName: 'Jesper Sev Murao',
+          postContent: 'Wassup!',
+          numOfLikes: 767,
           date: 'October 11',
         ),
-
         NewsFeedCard(
-          userName: 'Roben Juanatas',
+          userName: 'Jesper Sev Murao',
           postContent:
-              'Kicking off the holiday season with ICpEP-NCR!',
-          numOfLikes: 200,
+              'Look at my birdie!',
+          numOfLikes: 143,
           hasImage: true,
+          imagePath: 'assets/images/owl.jpg',
           date: 'December 2',
         ),
       ],

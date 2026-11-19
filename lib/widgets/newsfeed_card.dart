@@ -1,18 +1,13 @@
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../constants.dart';
-import 'custom_text.dart';
 
 class NewsFeedCard extends StatefulWidget {
   final String userName;
   final String postContent;
   final int numOfLikes;
-  final bool hasImage;
   final String date;
-  final String? profileImage;
-  final String? postImage;
+  final bool hasImage;
+  final String? imagePath;
 
   const NewsFeedCard({
     super.key,
@@ -21,8 +16,7 @@ class NewsFeedCard extends StatefulWidget {
     required this.numOfLikes,
     required this.date,
     this.hasImage = false,
-    this.profileImage,
-    this.postImage,
+    this.imagePath,
   });
 
   @override
@@ -30,25 +24,13 @@ class NewsFeedCard extends StatefulWidget {
 }
 
 class _NewsFeedCardState extends State<NewsFeedCard> {
-  bool isLiked = false;
   late int likes;
-  bool showComments = false;
-
-  final TextEditingController commentController =
-      TextEditingController();
-
-  final List<String> comments = [];
+  bool isLiked = false;
 
   @override
   void initState() {
     super.initState();
     likes = widget.numOfLikes;
-  }
-
-  @override
-  void dispose() {
-    commentController.dispose();
-    super.dispose();
   }
 
   void toggleLike() {
@@ -58,92 +40,78 @@ class _NewsFeedCardState extends State<NewsFeedCard> {
     });
   }
 
-  void addComment() {
-    final comment = commentController.text.trim();
-
-    if (comment.isEmpty) return;
-
-    setState(() {
-      comments.add(comment);
-      showComments = true;
-      commentController.clear();
-    });
-
-    FocusScope.of(context).unfocus();
-  }
-
-  void sharePost() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Share feature coming soon'),
+  Widget actionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    Color color = Colors.grey,
+  }) {
+    return Expanded(
+      child: TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          size: 18,
+          color: color,
+        ),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+          ),
+        ),
       ),
-    );
-  }
-
-  Widget buildAvatar({double radius = 20}) {
-    return CircleAvatar(
-      radius: radius.r,
-      backgroundColor: FB_LIGHT_PRIMARY,
-      backgroundImage: widget.profileImage != null
-          ? AssetImage(widget.profileImage!)
-          : null,
-      child: widget.profileImage == null
-          ? Icon(
-              Icons.person,
-              color: FB_DARK_PRIMARY,
-              size: radius.sp,
-            )
-          : null,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: 10.w,
-        vertical: 8.h,
-      ),
-      padding: EdgeInsets.all(12.w),
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 6,
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Profile information
           Row(
             children: [
-              buildAvatar(),
-              SizedBox(width: 10.w),
+              const CircleAvatar(
+                radius: 20,
+                backgroundImage: AssetImage(
+                  'assets/images/1x1.jpg',
+                ),
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      text: widget.userName,
-                      fontSize: 15.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      widget.userName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
-                    SizedBox(height: 3.h),
+                    const SizedBox(height: 3),
                     Row(
                       children: [
-                        CustomText(
-                          text: widget.date,
-                          fontSize: 12.sp,
-                          color: Colors.grey,
+                        Text(
+                          widget.date,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                          ),
                         ),
-                        SizedBox(width: 5.w),
-                        Icon(
+                        const SizedBox(width: 5),
+                        const Icon(
                           Icons.public,
-                          size: 13.sp,
+                          size: 12,
                           color: Colors.grey,
                         ),
                       ],
@@ -155,119 +123,115 @@ class _NewsFeedCardState extends State<NewsFeedCard> {
             ],
           ),
 
-          SizedBox(height: 15.h),
+          const SizedBox(height: 14),
 
-          CustomText(
-            text: widget.postContent,
-            fontSize: 14.sp,
-            color: Colors.black,
+          // Post content
+          Text(
+            widget.postContent,
+            style: const TextStyle(fontSize: 13),
           ),
 
-          if (widget.hasImage) ...[
-            SizedBox(height: 12.h),
+          // Post image - display full image without cropping
+          if (widget.hasImage &&
+              widget.imagePath != null) ...[
+            const SizedBox(height: 12),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: SizedBox(
-                height: 220.h,
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                widget.imagePath!,
                 width: double.infinity,
-                child: widget.postImage != null
-                    ? Image.asset(
-                        widget.postImage!,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: Colors.grey.shade200,
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 45.sp,
-                          color: Colors.grey,
-                        ),
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stack) {
+                  return Container(
+                    height: 230,
+                    width: double.infinity,
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: 70,
+                        color: Colors.grey,
                       ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
 
-          SizedBox(height: 12.h),
+          const SizedBox(height: 14),
 
+          // Number of likes
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.thumb_up,
-                size: 17.sp,
-                color: FB_PRIMARY,
+                color: Colors.blue,
+                size: 16,
               ),
-              SizedBox(width: 6.w),
-              Text('$likes'),
-              const Spacer(),
-              if (comments.isNotEmpty)
-                Text(
-                  '${comments.length} comments',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12.sp,
-                  ),
-                ),
+              const SizedBox(width: 5),
+              Text(
+                '$likes',
+                style: const TextStyle(fontSize: 12),
+              ),
             ],
           ),
 
           const Divider(),
 
+          // Widget-based action buttons
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ActionButton(
+              actionButton(
                 icon: isLiked
                     ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
                 label: 'Like',
-                color: isLiked ? FB_PRIMARY : Colors.grey,
+                color: isLiked
+                    ? Colors.blue
+                    : Colors.grey,
                 onPressed: toggleLike,
               ),
-              ActionButton(
+              actionButton(
                 icon: Icons.mode_comment_outlined,
                 label: 'Comment',
-                onPressed: () {
-                  setState(() {
-                    showComments = true;
-                  });
-                },
+                onPressed: () {},
               ),
-              ActionButton(
+              actionButton(
                 icon: Icons.share_outlined,
                 label: 'Share',
-                onPressed: sharePost,
+                onPressed: () {},
               ),
             ],
           ),
 
           const Divider(),
 
+          // Comment area
           Row(
             children: [
-              buildAvatar(radius: 15),
-              SizedBox(width: 10.w),
+              const CircleAvatar(
+                radius: 14,
+                backgroundImage: AssetImage(
+                  'assets/images/1x1.jpg',
+                ),
+              ),
+              const SizedBox(width: 8),
               Expanded(
-                child: TextField(
-                  controller: commentController,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => addComment(),
-                  decoration: InputDecoration(
-                    hintText: 'Write a comment...',
-                    hintStyle: TextStyle(fontSize: 12.sp),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    isDense: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: FB_PRIMARY,
-                        size: 18.sp,
-                      ),
-                      onPressed: addComment,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Write a comment...',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
                     ),
                   ),
                 ),
@@ -275,87 +239,16 @@ class _NewsFeedCardState extends State<NewsFeedCard> {
             ],
           ),
 
-          SizedBox(height: 10.h),
+          const SizedBox(height: 12),
 
-          TextButton(
-            onPressed: () {
-              setState(() {
-                showComments = !showComments;
-              });
-            },
-            child: Text(
-              showComments ? 'Hide comments' : 'View comments',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+          const Text(
+            'View comments',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
             ),
           ),
-
-          if (showComments)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (comments.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('No comments yet.'),
-                  ),
-                for (final comment in comments)
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 8.h),
-                    padding: EdgeInsets.all(10.w),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'You',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(comment),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
         ],
-      ),
-    );
-  }
-}
-
-class ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-  final Color color;
-
-  const ActionButton({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.color = Colors.grey,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, color: color, size: 18.sp),
-      label: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 12.sp,
-        ),
       ),
     );
   }
