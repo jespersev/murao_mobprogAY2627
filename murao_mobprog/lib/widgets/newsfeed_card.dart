@@ -1,65 +1,66 @@
-
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../constants.dart';
+import 'custom_text.dart';
 
 class NewsFeedCard extends StatefulWidget {
-  final String userName;
-  final String postContent;
-  final int numOfLikes;
-  final String date;
-  final bool hasImage;
-  final String? imagePath;
-
   const NewsFeedCard({
     super.key,
     required this.userName,
     required this.postContent,
-    required this.numOfLikes,
     required this.date,
+    this.profileImage = PROFILE_IMAGE,
+    this.numOfLikes = 0,
+    this.numOfComments = 0,
+    this.numOfShares = 0,
     this.hasImage = false,
-    this.imagePath,
+    this.imagePath = '',
   });
+
+  final String userName;
+  final String postContent;
+  final String date;
+  final String profileImage;
+  final int numOfLikes;
+  final int numOfComments;
+  final int numOfShares;
+  final bool hasImage;
+  final String imagePath;
 
   @override
   State<NewsFeedCard> createState() => _NewsFeedCardState();
 }
 
 class _NewsFeedCardState extends State<NewsFeedCard> {
-  late int likes;
   bool isLiked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    likes = widget.numOfLikes;
-  }
-
-  void toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-      likes += isLiked ? 1 : -1;
-    });
-  }
 
   Widget actionButton({
     required IconData icon,
     required String label,
+    required Color color,
     required VoidCallback onPressed,
-    Color color = Colors.grey,
   }) {
     return Expanded(
-      child: TextButton.icon(
+      child: TextButton(
         onPressed: onPressed,
-        icon: Icon(
-          icon,
-          size: 18,
-          color: color,
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 10.h),
         ),
-        label: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 19.sp, color: color),
+            SizedBox(width: 5.w),
+            Flexible(
+              child: CustomText(
+                text: label,
+                fontSize: 12.sp,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -67,188 +68,185 @@ class _NewsFeedCardState extends State<NewsFeedCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Profile information
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 20,
-                backgroundImage: AssetImage(
-                  'assets/images/1x1.jpg',
+    final int likes = widget.numOfLikes + (isLiked ? 1 : 0);
+
+    return Card(
+      color: CARD_BACKGROUND,
+      elevation: 0,
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 7.h),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      child: Padding(
+        padding: EdgeInsets.all(12.r),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 21.r,
+                  backgroundImage: AssetImage(widget.profileImage),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.userName,
-                      style: const TextStyle(
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        text: widget.userName,
+                        fontSize: 15.sp,
+                        color: TEXT_PRIMARY,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
                       ),
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Text(
-                          widget.date,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
+                      SizedBox(height: 3.h),
+                      Row(
+                        children: [
+                          CustomText(
+                            text: widget.date,
+                            fontSize: 11.sp,
+                            color: TEXT_SECONDARY,
                           ),
-                        ),
-                        const SizedBox(width: 5),
-                        const Icon(
-                          Icons.public,
-                          size: 12,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.more_horiz),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          // Post content
-          Text(
-            widget.postContent,
-            style: const TextStyle(fontSize: 13),
-          ),
-
-          // Post image - display full image without cropping
-          if (widget.hasImage &&
-              widget.imagePath != null) ...[
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.asset(
-                widget.imagePath!,
-                width: double.infinity,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stack) {
-                  return Container(
-                    height: 230,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        size: 70,
-                        color: Colors.grey,
+                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.public,
+                            size: 12.sp,
+                            color: TEXT_SECONDARY,
+                          ),
+                        ],
                       ),
-                    ),
-                  );
-                },
-              ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.more_horiz),
+              ],
             ),
-          ],
 
-          const SizedBox(height: 14),
+            SizedBox(height: 12.h),
 
-          // Number of likes
-          Row(
-            children: [
-              const Icon(
-                Icons.thumb_up,
-                color: Colors.blue,
-                size: 16,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '$likes',
-                style: const TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
+            CustomText(
+              text: widget.postContent,
+              fontSize: 14.sp,
+              color: TEXT_PRIMARY,
+            ),
 
-          const Divider(),
-
-          // Widget-based action buttons
-          Row(
-            children: [
-              actionButton(
-                icon: isLiked
-                    ? Icons.thumb_up
-                    : Icons.thumb_up_outlined,
-                label: 'Like',
-                color: isLiked
-                    ? Colors.blue
-                    : Colors.grey,
-                onPressed: toggleLike,
-              ),
-              actionButton(
-                icon: Icons.mode_comment_outlined,
-                label: 'Comment',
-                onPressed: () {},
-              ),
-              actionButton(
-                icon: Icons.share_outlined,
-                label: 'Share',
-                onPressed: () {},
-              ),
-            ],
-          ),
-
-          const Divider(),
-
-          // Comment area
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 14,
-                backgroundImage: AssetImage(
-                  'assets/images/1x1.jpg',
+            if (widget.hasImage) ...[
+              SizedBox(height: 10.h),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5.r),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 400,
+                  child: widget.imagePath.isNotEmpty
+                      ? Image.asset(widget.imagePath, fit: BoxFit.cover)
+                      : const Placeholder(),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+            ],
+
+            SizedBox(height: 12.h),
+
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(4.r),
+                  decoration: const BoxDecoration(
+                    color: FB_PRIMARY,
+                    shape: BoxShape.circle,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'Write a comment...',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
+                  child: Icon(Icons.thumb_up, color: Colors.white, size: 11.sp),
+                ),
+                SizedBox(width: 5.w),
+                CustomText(
+                  text: '$likes',
+                  fontSize: 12.sp,
+                  color: TEXT_SECONDARY,
+                ),
+                const Spacer(),
+                CustomText(
+                  text: '${widget.numOfComments} comments',
+                  fontSize: 11.sp,
+                  color: TEXT_SECONDARY,
+                ),
+                SizedBox(width: 10.w),
+                CustomText(
+                  text: '${widget.numOfShares} shares',
+                  fontSize: 11.sp,
+                  color: TEXT_SECONDARY,
+                ),
+              ],
+            ),
+
+            SizedBox(height: 6.h),
+
+            const Divider(height: 1),
+
+            Row(
+              children: [
+                actionButton(
+                  icon: isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                  label: 'Like',
+                  color: isLiked ? FB_PRIMARY : TEXT_SECONDARY,
+                  onPressed: () {
+                    setState(() {
+                      isLiked = !isLiked;
+                    });
+                  },
+                ),
+                actionButton(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  label: 'Comment',
+                  color: TEXT_SECONDARY,
+                  onPressed: () {},
+                ),
+                actionButton(
+                  icon: Icons.reply_rounded,
+                  label: 'Share',
+                  color: TEXT_SECONDARY,
+                  onPressed: () {},
+                ),
+              ],
+            ),
+
+            const Divider(height: 1),
+
+            SizedBox(height: 10.h),
+
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 15.r,
+                  backgroundImage: const AssetImage(PROFILE_IMAGE),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 10.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: APP_BACKGROUND,
+                      borderRadius: BorderRadius.circular(30.r),
+                    ),
+                    child: CustomText(
+                      text: 'Write a comment...',
+                      fontSize: 12.sp,
+                      color: TEXT_SECONDARY,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          const SizedBox(height: 12),
+            SizedBox(height: 10.h),
 
-          const Text(
-            'View comments',
-            style: TextStyle(
-              fontSize: 12,
+            CustomText(
+              text: 'View comments',
+              fontSize: 12.sp,
+              color: TEXT_PRIMARY,
               fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

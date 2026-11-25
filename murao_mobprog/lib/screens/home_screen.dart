@@ -1,9 +1,9 @@
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../constants.dart';
 import 'newsfeed_screen.dart';
+import 'notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,118 +13,94 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  final PageController _pageController = PageController();
+  int selectedIndex = 0;
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  final List<String> titles = [APP_NAME, 'Notifications', 'Profile'];
 
-  void _showProfile() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('My Profile'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 45,
-              backgroundImage:
-                  AssetImage('assets/images/1x1.jpg'),
+  final List<Widget> screens = [
+    const NewsFeedScreen(),
+    const NotificationScreen(),
+    const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(radius: 50, backgroundImage: AssetImage(PROFILE_IMAGE)),
+          SizedBox(height: 15),
+          Text(
+            'Jesper Sev Murao',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: TEXT_PRIMARY,
             ),
-            SizedBox(height: 15),
-            Text(
-              'Jesper Sev V. Murao',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text('INF241-MWA'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
           ),
         ],
       ),
-    );
-  }
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F1FA),
+      backgroundColor: APP_BACKGROUND,
+
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F1FA),
-        elevation: 2,
+        backgroundColor: CARD_BACKGROUND,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         title: Text(
-          'facebook',
+          titles[selectedIndex],
           style: TextStyle(
             fontSize: 25.sp,
             fontWeight: FontWeight.bold,
-            color: FB_PRIMARY,
+            color: selectedIndex == 0 ? FB_PRIMARY : TEXT_PRIMARY,
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: _showProfile,
-            icon: const CircleAvatar(
-              radius: 18,
-              backgroundImage:
-                  AssetImage('assets/images/1x1.jpg'),
+          if (selectedIndex == 0)
+            Padding(
+              padding: EdgeInsets.only(right: 15.w),
+              child: CircleAvatar(
+                radius: 18.r,
+                backgroundImage: const AssetImage(PROFILE_IMAGE),
+              ),
             ),
-          ),
-          SizedBox(width: 8.w),
         ],
       ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (page) {
-          setState(() {
-            _selectedIndex = page;
-          });
-        },
-        children: const [
-          NewsFeedScreen(),
-          Center(
-            child: Text('Notifications'),
-          ),
-        ],
-      ),
+
+      body: IndexedStack(index: selectedIndex, children: screens),
+
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: CARD_BACKGROUND,
+        selectedItemColor: FB_PRIMARY,
+        unselectedItemColor: TEXT_SECONDARY,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        backgroundColor: const Color(0xFFF7F1FA),
-        selectedItemColor: FB_PRIMARY,
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onTappedBar,
+        onTap: (index) {
+          setState(() {
+            selectedIndex = index;
+          });
+        },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+            icon: Icon(Icons.notifications_none),
+            activeIcon: Icon(Icons.notifications),
             label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),
     );
-  }
-
-  void _onTappedBar(int value) {
-    setState(() {
-      _selectedIndex = value;
-    });
-
-    _pageController.jumpToPage(value);
   }
 }

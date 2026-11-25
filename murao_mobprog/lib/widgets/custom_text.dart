@@ -15,11 +15,11 @@ class CustomText extends StatelessWidget {
 
   final String text;
   final double fontSize;
+  final double letterSpacing;
   final Color color;
   final FontWeight fontWeight;
   final TextAlign textAlign;
   final String? fontFamily;
-  final double letterSpacing;
   final FontStyle fontStyle;
 
   @override
