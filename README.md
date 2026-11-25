@@ -15,3 +15,11 @@ Laboratory 0: In this activity, I experienced installing and setting up Flutter 
 ### Discussion
 
 In this activity, I learned how to organize my Flutter project by separating the screens, widgets, and constants into different files. At first, I encountered some problems when running the application because of errors in the widgets, but I was able to fix them by checking the terminal and updating the code. For the enhancements, I added my own profile picture using 1x1.jpg and an image in the second post using owl.jpg. I also learned how to make the post image dynamic by using hasImage and imagePath in newsfeed_card.dart, so the same widget can display posts with or without images. I also used reusable widgets for the Like, Comment, and Share buttons. Overall, this activity helped me understand how file structuring and reusable widgets make my Flutter application more organized and easier to manage.
+
+---
+
+## Lab Activity 2A
+
+### Discussion
+
+I learned how to create a notification screen and navigate between different screens. For my enhancements, I renamed my application to fakenews, changed the color scheme, added different profile pictures and captions, and improved the Like, Comment, and Share buttons. I also learned how to improve the design and functionality of my application while reusing my previous code.
